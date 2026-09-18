@@ -20,7 +20,18 @@
 TODO*.md
 AGENTS*.md
 
-# Secrets / local config
+# Secrets / local environment
 .env
 .env.*
 !.env.example
+*.key
+*.pem
+*.secret
+secrets/
+
+# Machine-specific local files
+*.local
+.local/
+
+# Never commit local Ollama data/models
+.ollama/

@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+
+VERSION="0.1.0"
+MODEL="${QCHEAT_MODEL:-qwen-cheat}"
+
+usage() {
+  cat <<'USAGE'
+qcheat - fast local CLI cheat-sheet assistant
+
+Usage:
+  qcheat <question>
+  printf '%s\n' '<question>' | qcheat
+
+Options:
+  -h, --help       Show this help
+  -V, --version    Show version
+
+Examples:
+  qcheat copy a file
+  qcheat vim copy current word
+  qcheat git create and switch to a new branch
+USAGE
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  -V|--version)
+    printf 'qcheat %s\n' "$VERSION"
+    exit 0
+    ;;
+esac
+
+if ! command -v ollama >/dev/null 2>&1; then
+  printf 'qcheat: ollama not found. Run the qcheat installer first.\n' >&2
+  exit 1
+fi
+
+if ! command -v mdcat >/dev/null 2>&1; then
+  printf 'qcheat: mdcat not found. Run the qcheat installer first.\n' >&2
+  exit 1
+fi
+
+if [[ $# -gt 0 ]]; then
+  QUESTION="$*"
+elif [[ ! -t 0 ]]; then
+  QUESTION="$(cat)"
+else
+  usage
+  exit 1
+fi
+
+[[ -n "${QUESTION//[[:space:]]/}" ]] || {
+  printf 'qcheat: question is empty.\n' >&2
+  exit 1
+}
+
+OS_NAME="$(uname -s 2>/dev/null || printf 'unknown')"
+ARCH_NAME="$(uname -m 2>/dev/null || printf 'unknown')"
+SHELL_NAME="$(basename "${SHELL:-unknown}")"
+
+PROMPT="Runtime context: OS=${OS_NAME}, shell=${SHELL_NAME}, architecture=${ARCH_NAME}.
+
+User question: ${QUESTION}"
+
+ollama run "$MODEL" "$PROMPT" | mdcat --local -
