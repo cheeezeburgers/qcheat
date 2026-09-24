@@ -3,7 +3,45 @@
 set -Eeuo pipefail
 
 APP_NAME="qcheat"
-VERSION="0.1.0"
+VERSION="0.2.0"
+DRY_RUN=false
+
+usage() {
+  cat <<'EOF'
+qcheat installer
+
+Usage:
+  ./install.sh [options]
+
+Options:
+  --dry-run       Show what would be done without making changes
+  -h, --help      Show this help
+  -V, --version   Show version
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=true
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -V|--version)
+      printf '%s %s\n' "$APP_NAME" "$VERSION"
+      exit 0
+      ;;
+    *)
+      printf 'Unknown option: %s\n\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+
+  shift
+done
 
 BASE_MODEL="qwen2.5-coder:3b-instruct"
 CUSTOM_MODEL="qwen-cheat"
@@ -45,6 +83,27 @@ info() {
 die() {
   fail "$*"
   exit 1
+}
+
+run() {
+  if [[ "$DRY_RUN" == true ]]; then
+    printf '[DRY]'
+    printf ' %q' "$@"
+    printf '\n'
+  else
+    "$@"
+  fi
+}
+
+append_block() {
+  local file="$1"
+  local content="$2"
+
+  if [[ "$DRY_RUN" == true ]]; then
+    printf '[DRY] append to %s:\n%s\n' "$file" "$content"
+  else
+    printf '\n%s\n' "$content" >> "$file"
+  fi
 }
 
 trap 'fail "Installation stopped near line ${LINENO}."' ERR
@@ -109,12 +168,20 @@ install_ollama() {
   info "Installing Ollama..."
 
   if [[ "$OS" == "macos" ]]; then
-    brew install ollama
+    run brew install ollama
   else
     command -v curl >/dev/null 2>&1 ||
       die "curl is required to install Ollama on Linux."
 
-    curl -fsSL https://ollama.com/install.sh | sh
+    if [[ "$DRY_RUN" == true ]]; then
+      printf '[DRY] curl -fsSL https://ollama.com/install.sh | sh\n'
+    else
+      curl -fsSL https://ollama.com/install.sh | sh
+    fi
+  fi
+
+  if [[ "$DRY_RUN" == true ]]; then
+    return
   fi
 
   command -v ollama >/dev/null 2>&1 ||
@@ -136,39 +203,48 @@ install_mdcat() {
 
   info "Installing mdcat..."
 
+  if [[ "$DRY_RUN" == true && "$OS" == "linux" ]] &&
+     ! command -v brew >/dev/null 2>&1; then
+    info "Package availability will be checked during installation; preview assumes the first available package manager provides mdcat."
+  fi
+
   if [[ "$OS" == "macos" ]]; then
 
-    brew install mdcat
+    run brew install mdcat
 
   elif command -v brew >/dev/null 2>&1; then
 
-    brew install mdcat
+    run brew install mdcat
 
   elif command -v apt-get >/dev/null 2>&1 &&
-       apt-cache show mdcat >/dev/null 2>&1; then
+       { [[ "$DRY_RUN" == true ]] || apt-cache show mdcat >/dev/null 2>&1; }; then
 
-    sudo apt-get update
-    sudo apt-get install -y mdcat
+    run sudo apt-get update
+    run sudo apt-get install -y mdcat
 
   elif command -v dnf >/dev/null 2>&1 &&
-       dnf info mdcat >/dev/null 2>&1; then
+       { [[ "$DRY_RUN" == true ]] || dnf info mdcat >/dev/null 2>&1; }; then
 
-    sudo dnf install -y mdcat
+    run sudo dnf install -y mdcat
 
   elif command -v pacman >/dev/null 2>&1 &&
-       pacman -Si mdcat >/dev/null 2>&1; then
+       { [[ "$DRY_RUN" == true ]] || pacman -Si mdcat >/dev/null 2>&1; }; then
 
-    sudo pacman -S --needed --noconfirm mdcat
+    run sudo pacman -S --needed --noconfirm mdcat
 
   elif command -v cargo >/dev/null 2>&1; then
 
     warn "No packaged mdcat was found; Cargo will compile it from source."
-    cargo install mdcat --locked
+    run cargo install mdcat --locked
 
   else
 
     die "Could not install mdcat automatically. Install mdcat (or Homebrew/Rust Cargo) and re-run ./install.sh."
 
+  fi
+
+  if [[ "$DRY_RUN" == true ]]; then
+    return
   fi
 
   command -v mdcat >/dev/null 2>&1 ||
@@ -183,8 +259,14 @@ install_mdcat() {
 # ---------------------------------------------------------
 
 ensure_ollama_server() {
-  if ollama list >/dev/null 2>&1; then
+  if command -v ollama >/dev/null 2>&1 &&
+     ollama list >/dev/null 2>&1; then
     ok "Ollama service is running"
+    return
+  fi
+
+  if [[ "$DRY_RUN" == true ]]; then
+    printf '[DRY] start Ollama service if necessary\n'
     return
   fi
 
@@ -226,13 +308,17 @@ ensure_ollama_server() {
 # ---------------------------------------------------------
 
 install_qcheat_command() {
-  mkdir -p "$INSTALL_DIR"
+  run mkdir -p "$INSTALL_DIR"
 
-  install -m 0755 \
+  run install -m 0755 \
     "$QCHEAT_SOURCE" \
     "$INSTALL_DIR/qcheat"
 
-  ok "Installed command: $INSTALL_DIR/qcheat"
+  if [[ "$DRY_RUN" == true ]]; then
+    info "Would install command: $INSTALL_DIR/qcheat"
+  else
+    ok "Installed command: $INSTALL_DIR/qcheat"
+  fi
 }
 
 
@@ -276,6 +362,7 @@ ensure_local_bin_on_path() {
 
   if [[ -z "$rc_file" ]]; then
     warn "Unknown shell '${SHELL:-unknown}'. Add $INSTALL_DIR to PATH manually."
+    printf '  export PATH="$HOME/.local/bin:$PATH"\n'
     return
   fi
 
@@ -285,25 +372,31 @@ ensure_local_bin_on_path() {
   case "${answer:-Y}" in
     [Yy]*)
 
-      touch "$rc_file"
-
       if ! grep -Fq \
         'export PATH="$HOME/.local/bin:$PATH"' \
-        "$rc_file"; then
+        "$rc_file" 2>/dev/null; then
 
-        {
-          printf '\n# qcheat\n'
-          printf 'export PATH="$HOME/.local/bin:$PATH"\n'
-        } >> "$rc_file"
+        append_block "$rc_file" \
+'# qcheat
+export PATH="$HOME/.local/bin:$PATH"'
 
+        if [[ "$DRY_RUN" == true ]]; then
+          info "Would add ~/.local/bin to PATH in $rc_file"
+        else
+          ok "Added ~/.local/bin to PATH in $rc_file"
+        fi
+      else
+        ok "PATH entry already present in $rc_file"
       fi
-
-      ok "Added ~/.local/bin to PATH in $rc_file"
       ;;
 
     *)
       warn "Skipped PATH change."
-      warn "qcheat is installed at $INSTALL_DIR/qcheat."
+      if [[ "$DRY_RUN" == true ]]; then
+        info "qcheat would be installed at $INSTALL_DIR/qcheat."
+      else
+        warn "qcheat is installed at $INSTALL_DIR/qcheat."
+      fi
       ;;
   esac
 }
@@ -349,7 +442,7 @@ prompt_for_alias() {
   printf "Add a shorter alias for qcheat (default: q)? [y/N] "
   read -r answer
 
-  [[ "${answer:-N}" =~ ^[Yy]$ ]] || return
+  [[ "${answer:-N}" =~ ^[Yy]$ ]] || return 0
 
   local alias_name="q"
 
@@ -383,14 +476,15 @@ prompt_for_alias() {
 
   done
 
-  touch "$rc_file"
+  append_block "$rc_file" \
+"# qcheat shortcut
+alias ${alias_name}='qcheat'"
 
-  {
-    printf '\n# qcheat shortcut\n'
-    printf "alias %s='qcheat'\n" "$alias_name"
-  } >> "$rc_file"
-
-  ok "Added alias '$alias_name' -> qcheat to $rc_file"
+  if [[ "$DRY_RUN" == true ]]; then
+    info "Would add alias '$alias_name' -> qcheat to $rc_file"
+  else
+    ok "Added alias '$alias_name' -> qcheat to $rc_file"
+  fi
 }
 
 
@@ -405,16 +499,24 @@ ensure_ollama_server
 
 info "Pulling $BASE_MODEL..."
 
-ollama pull "$BASE_MODEL"
+run ollama pull "$BASE_MODEL"
 
-ok "Base model ready: $BASE_MODEL"
+if [[ "$DRY_RUN" == true ]]; then
+  info "Would prepare base model: $BASE_MODEL"
+else
+  ok "Base model ready: $BASE_MODEL"
+fi
 
 
 info "Building $CUSTOM_MODEL..."
 
-ollama create "$CUSTOM_MODEL" -f "$MODELFILE"
+run ollama create "$CUSTOM_MODEL" -f "$MODELFILE"
 
-ok "Custom model ready: $CUSTOM_MODEL"
+if [[ "$DRY_RUN" == true ]]; then
+  info "Would build custom model: $CUSTOM_MODEL"
+else
+  ok "Custom model ready: $CUSTOM_MODEL"
+fi
 
 
 install_qcheat_command
@@ -430,11 +532,15 @@ prompt_for_alias
 
 printf '\n'
 
-ok "qcheat $VERSION installed successfully."
+if [[ "$DRY_RUN" == true ]]; then
+  printf '[DRY] Dry run completed. No installation changes were made.\n'
+else
+  ok "qcheat $VERSION installed successfully."
 
-printf '\nTry it with:\n'
-printf '  qcheat copy a file\n'
-printf '  qcheat vim delete to end of line\n'
-printf '  qcheat git create and switch to a new branch\n'
+  printf '\nTry it with:\n'
+  printf '  qcheat copy a file\n'
+  printf '  qcheat vim delete to end of line\n'
+  printf '  qcheat git create and switch to a new branch\n'
 
-printf '\nIf PATH or an alias was added, open a new shell or source your shell rc file first.\n'
+  printf '\nIf PATH or an alias was added, open a new shell or source your shell rc file first.\n'
+fi

@@ -1,5 +1,7 @@
 # qcheat
 
+Current version: `0.2.0`.
+
 A tiny, fast, local AI cheat sheet for your terminal.
 
 `qcheat` uses Ollama and Qwen2.5-Coder to answer short command-line questions directly in your shell, with Markdown and syntax highlighting rendered by `mdcat`.
@@ -95,6 +97,26 @@ The installer will:
 8. install `qcheat` to `~/.local/bin/qcheat`
 9. offer to add `~/.local/bin` to your PATH if necessary
 10. optionally add a shorter shell alias
+
+### Preview an installation
+
+```bash
+./install.sh --dry-run
+```
+
+Dry-run prints the commands and shell configuration blocks it would apply. It does not install dependencies, start services, download or build models, create directories, copy files, or edit shell configuration. Read-only checks still run, including OS detection, dependency versions, and `ollama list`. The PATH and alias prompts remain interactive; accepting them only previews the changes.
+
+On Linux, dry-run skips package metadata queries and assumes the first available supported package manager provides `mdcat`. A real installation checks package availability and may choose a different fallback.
+
+Installer options:
+
+| Option | Description |
+| --- | --- |
+| `--dry-run` | Preview installation without making changes |
+| `-h`, `--help` | Show installer help |
+| `-V`, `--version` | Show the project version |
+
+Unknown installer arguments are rejected with exit status 2 before installation begins.
 
 ## Usage
 
