@@ -1,5 +1,11 @@
 # qcheat
 
+[![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](
+  https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml
+)
+![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
+![Bash](https://img.shields.io/badge/bash-5%2B-blue)
+
 A tiny, fast, local AI cheat sheet for your terminal.
 
 `qcheat` uses Ollama and Qwen2.5-Coder to answer short command-line questions directly in your shell, with Markdown and syntax highlighting rendered by `mdcat`.
