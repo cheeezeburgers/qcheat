@@ -6,6 +6,10 @@ APP_NAME="qcheat"
 VERSION="0.2.0"
 DRY_RUN=false
 
+# Write the literal variables to the user's shell configuration.
+# shellcheck disable=SC2016
+PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
+
 usage() {
   cat <<'EOF'
 qcheat installer
@@ -362,7 +366,7 @@ ensure_local_bin_on_path() {
 
   if [[ -z "$rc_file" ]]; then
     warn "Unknown shell '${SHELL:-unknown}'. Add $INSTALL_DIR to PATH manually."
-    printf '  export PATH="$HOME/.local/bin:$PATH"\n'
+    printf '  %s\n' "$PATH_LINE"
     return
   fi
 
@@ -373,12 +377,11 @@ ensure_local_bin_on_path() {
     [Yy]*)
 
       if ! grep -Fq \
-        'export PATH="$HOME/.local/bin:$PATH"' \
+        "$PATH_LINE" \
         "$rc_file" 2>/dev/null; then
 
-        append_block "$rc_file" \
-'# qcheat
-export PATH="$HOME/.local/bin:$PATH"'
+        append_block "$rc_file" "# qcheat
+$PATH_LINE"
 
         if [[ "$DRY_RUN" == true ]]; then
           info "Would add ~/.local/bin to PATH in $rc_file"
