@@ -18,6 +18,29 @@ No API key is required.
 
 After the model and dependencies have been downloaded, queries are processed locally.
 
+## Index
+
++ [qcheat](#qcheat)
+	+ [Index](#index)
+	+ [What it is for](#what-it-is-for)
+	+ [Example](#example)
+	+ [Requirements](#requirements)
+	+ [Installation](#installation)
+		+ [Preview an installation](#preview-an-installation)
+	+ [Usage](#usage)
+	+ [Optional short alias](#optional-short-alias)
+	+ [The custom model](#the-custom-model)
+	+ [Why not AIChat + Qwen3?](#why-not-aichat--qwen3)
+	+ [Privacy and offline use](#privacy-and-offline-use)
+	+ [Files installed](#files-installed)
+	+ [Updating](#updating)
+	+ [Uninstall](#uninstall)
+	+ [Troubleshooting](#troubleshooting)
+		+ [`qcheat: command not found`](#qcheat-command-not-found)
+		+ [Ollama is not running](#ollama-is-not-running)
+		+ [mdcat takes a long time to install on Apple Silicon](#mdcat-takes-a-long-time-to-install-on-apple-silicon)
+	+ [License](#license)
+
 ## What it is for
 
 `qcheat` is meant for small questions you repeatedly forget:
