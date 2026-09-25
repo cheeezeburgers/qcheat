@@ -19,6 +19,7 @@
 # .md
 TODO*.md
 AGENTS*.md
+CODEX*.md
 
 # Secrets / local environment
 .env
