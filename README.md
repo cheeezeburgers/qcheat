@@ -4,7 +4,6 @@
   https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml
 )
 ![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
-![Bash](https://img.shields.io/badge/bash-5%2B-blue)
 
 A tiny, fast, local AI cheat sheet for your terminal.
 
