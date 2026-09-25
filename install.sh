@@ -149,7 +149,8 @@ if [[ "$OS" == "macos" ]]; then
     die "Homebrew is required on macOS. Install Homebrew, then run ./install.sh again."
   fi
 
-  ok "Homebrew found: $(brew --version | head -n 1)"
+  brew_version="$(brew --version)"
+  ok "Homebrew found: ${brew_version%%$'\n'*}"
 
   if [[ "$(uname -m)" == "arm64" &&
         "$(brew --prefix)" == "/usr/local"* ]]; then
@@ -165,7 +166,14 @@ fi
 
 install_ollama() {
   if command -v ollama >/dev/null 2>&1; then
-    ok "Ollama already installed: $(ollama --version 2>/dev/null | head -n 1 || printf 'version unknown')"
+    ollama_version="$(ollama --version 2>/dev/null || true)"
+
+    if [[ -n "$ollama_version" ]]; then
+      ok "Ollama already installed: ${ollama_version%%$'\n'*}"
+    else
+      ok "Ollama already installed: version unknown"
+    fi
+
     return
   fi
 
@@ -201,7 +209,14 @@ install_ollama() {
 
 install_mdcat() {
   if command -v mdcat >/dev/null 2>&1; then
-    ok "mdcat already installed: $(mdcat --version 2>/dev/null | head -n 1 || printf 'version unknown')"
+    mdcat_version="$(mdcat --version 2>/dev/null || true)"
+
+    if [[ -n "$mdcat_version" ]]; then
+      ok "mdcat already installed: ${mdcat_version%%$'\n'*}"
+    else
+      ok "mdcat already installed: version unknown"
+    fi
+
     return
   fi
 
