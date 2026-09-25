@@ -4,7 +4,7 @@
 [![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](
   https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml
 )
-[![install test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-test.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
+[![install test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
 
 A tiny, fast, local AI cheat sheet for your terminal.
 
