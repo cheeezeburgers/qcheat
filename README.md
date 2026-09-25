@@ -1,9 +1,7 @@
 # qcheat
 
 ![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
-[![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](
-  https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml
-)
+[![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml)
 [![install test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
 
 A tiny, fast, local AI cheat sheet for your terminal.
@@ -65,6 +63,9 @@ The assistant focuses on:
 
 `qcheat` automatically includes the current operating system, shell and CPU architecture with each question.
 
+> [!WARNING]
+> `qcheat` is currently still stupid and may give wrong or incomplete answers. I still need to fine tune it.
+
 ## Example
 
 ```bash
@@ -125,6 +126,9 @@ The installer will:
 9. offer to add `~/.local/bin` to your PATH if necessary
 10. optionally add a shorter shell alias
 
+> [!IMPORTANT]
+> `~/.local/bin` must be in your `PATH` for the `qcheat` command to work. The installer can add it for you if necessary.
+
 ### Preview an installation
 
 ```bash
@@ -137,11 +141,11 @@ On Linux, dry-run skips package metadata queries and assumes the first available
 
 Installer options:
 
-| Option | Description |
-| --- | --- |
-| `--dry-run` | Preview installation without making changes |
-| `-h`, `--help` | Show installer help |
-| `-V`, `--version` | Show the project version |
+| Option            | Description                                 |
+| ----------------- | ------------------------------------------- |
+| `--dry-run`       | Preview installation without making changes |
+| `-h`, `--help`    | Show installer help                         |
+| `-V`, `--version` | Show the project version                    |
 
 Unknown installer arguments are rejected with exit status 2 before installation begins.
 
@@ -193,6 +197,9 @@ Then:
 q vim copy word
 q git create branch
 ```
+
+> [!TIP]
+> Add `alias q='qcheat'` to your shell config for faster access.
 
 If `q` already appears to be in use, the installer will warn you and ask for a different alias.
 
@@ -346,6 +353,9 @@ Remove the custom model:
 ```bash
 ollama rm qwen-cheat
 ```
+
+> [!CAUTION]
+> Only remove the base model if you do not use it with any other Ollama tools or projects.
 
 If you do not use the base model for anything else, you can also remove it:
 
