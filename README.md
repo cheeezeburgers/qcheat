@@ -5,7 +5,8 @@
 ![Qwen](https://img.shields.io/badge/model-Qwen-blue)
 ![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
 [![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml)
-[![install test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
+[![macOS Test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
+[![Linux Test](https://github.com/cheeezeburgers/qcheat/actions/workflows/linux-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/linux-testing.yml)
 
 A tiny, fast, local AI cheat sheet for your terminal.
 

@@ -1,0 +1,36 @@
+name: Linux Test
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  ubuntu-bash:
+    name: Ubuntu / bash
+    runs-on: ubuntu-latest
+
+    env:
+      SHELL: /bin/bash
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Show environment
+        run: |
+          cat /etc/os-release
+          uname -m
+          bash --version
+
+      - name: Check Bash syntax
+        run: |
+          bash -n install.sh
+          bash -n bin/qcheat
+
+      - name: Test installer dry-run
+        run: |
+          printf 'y\ny\n' | ./install.sh --dry-run
