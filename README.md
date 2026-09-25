@@ -9,6 +9,8 @@
 
 A tiny, fast, local AI cheat sheet for your terminal.
 
+![qcheat demo](assets/qcheat.gif)
+
 `qcheat` uses Ollama and Qwen2.5-Coder to answer short command-line questions directly in your shell, with Markdown and syntax highlighting rendered by `mdcat`.
 
 ```text

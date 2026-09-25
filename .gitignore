@@ -7,6 +7,9 @@
 .vscode/
 .idea/
 
+# Helpers
+*.tape
+
 # Temporary files
 *.swp
 *.swo
