@@ -1,9 +1,10 @@
 # qcheat
 
+![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
 [![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](
   https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml
 )
-![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
+[![install test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-test.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
 
 A tiny, fast, local AI cheat sheet for your terminal.
 
