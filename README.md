@@ -1,5 +1,8 @@
 # qcheat
 
+![Local AI](https://img.shields.io/badge/AI-local-blue)
+![Ollama](https://img.shields.io/badge/Ollama-powered-blue)
+![Qwen](https://img.shields.io/badge/model-Qwen-blue)
 ![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
 [![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml)
 [![install test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
