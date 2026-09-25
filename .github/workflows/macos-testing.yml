@@ -1,0 +1,37 @@
+name: macOS Test
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  macos-zsh:
+    name: macOS / zsh
+    runs-on: macos-latest
+
+    env:
+      SHELL: /bin/zsh
+
+    defaults:
+      run:
+        shell: zsh {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Show environment
+        run: |
+          sw_vers
+          uname -m
+          zsh --version
+          brew --version
+
+      - name: Check Bash syntax
+        run: |
+          bash -n install.sh
+          bash -n bin/qcheat
+
+      - name: Test installer dry-run
+        run: |
+          printf 'y\ny\n' | ./install.sh --dry-run
