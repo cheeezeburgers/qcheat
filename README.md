@@ -3,12 +3,14 @@
 ![Local AI](https://img.shields.io/badge/AI-local-blue)
 ![Ollama](https://img.shields.io/badge/Ollama-powered-blue)
 ![Qwen](https://img.shields.io/badge/model-Qwen-blue)
-![macOS](https://img.shields.io/badge/macOS-supported-brightgreen)
-[![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml)
+
 [![macOS Test](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/macos-testing.yml)
 [![Linux Test](https://github.com/cheeezeburgers/qcheat/actions/workflows/linux-testing.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/linux-testing.yml)
+[![ShellCheck](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/cheeezeburgers/qcheat/actions/workflows/shellcheck.yml)
 
 A tiny, fast, local AI cheat sheet for your terminal.
+
+![qcheat-hero-img](assets/qcheat-hero-img.png)
 
 ![qcheat demo](assets/qcheat.gif)
 
