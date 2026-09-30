@@ -2,6 +2,7 @@ name: Linux Test
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -30,6 +31,11 @@ jobs:
         run: |
           bash -n install.sh
           bash -n bin/qcheat
+          bash -n lib/docs.sh
+          bash -n tests/run.sh
+
+      - name: Test offline documentation lookup and installation
+        run: bash tests/run.sh
 
       - name: Test installer dry-run
         run: |

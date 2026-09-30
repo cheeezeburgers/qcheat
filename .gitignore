@@ -15,6 +15,7 @@
 *.swo
 *~
 *.tmp
+.test-work.*/
 
 # Logs
 *.log

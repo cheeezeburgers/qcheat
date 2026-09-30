@@ -3,7 +3,10 @@
 set -Eeuo pipefail
 
 APP_NAME="qcheat"
-VERSION="0.2.0"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# bin/qcheat is the canonical version source; --version needs no dependencies.
+VERSION="$(bash "$SCRIPT_DIR/bin/qcheat" --version)"
+VERSION="${VERSION#qcheat }"
 DRY_RUN=false
 
 # Write the literal variables to the user's shell configuration.
@@ -51,8 +54,8 @@ BASE_MODEL="qwen2.5-coder:3b-instruct"
 CUSTOM_MODEL="qwen-cheat"
 
 INSTALL_DIR="${HOME}/.local/bin"
+LIB_DIR="${HOME}/.local/lib/qcheat"
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 MODELFILE="${SCRIPT_DIR}/Modelfile"
 QCHEAT_SOURCE="${SCRIPT_DIR}/bin/qcheat"
 
@@ -118,6 +121,10 @@ trap 'fail "Installation stopped near line ${LINENO}."' ERR
 [[ -f "$QCHEAT_SOURCE" ]] ||
   die "qcheat executable not found: $QCHEAT_SOURCE"
 
+for library_file in docs.sh excerpt.awk; do
+  [[ -f "$SCRIPT_DIR/lib/$library_file" ]] ||
+    die "qcheat library not found: $SCRIPT_DIR/lib/$library_file"
+done
 
 # ---------------------------------------------------------
 # OS
@@ -327,7 +334,12 @@ ensure_ollama_server() {
 # ---------------------------------------------------------
 
 install_qcheat_command() {
-  run mkdir -p "$INSTALL_DIR"
+  local library_file
+  run mkdir -p "$INSTALL_DIR" "$LIB_DIR"
+
+  for library_file in docs.sh excerpt.awk; do
+    run install -m 0644 "$SCRIPT_DIR/lib/$library_file" "$LIB_DIR/$library_file"
+  done
 
   run install -m 0755 \
     "$QCHEAT_SOURCE" \
@@ -335,8 +347,10 @@ install_qcheat_command() {
 
   if [[ "$DRY_RUN" == true ]]; then
     info "Would install command: $INSTALL_DIR/qcheat"
+    info "Would install documentation lookup library: $LIB_DIR"
   else
     ok "Installed command: $INSTALL_DIR/qcheat"
+    ok "Installed documentation lookup library: $LIB_DIR"
   fi
 }
 
