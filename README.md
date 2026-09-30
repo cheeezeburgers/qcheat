@@ -14,38 +14,38 @@ A tiny, fast, local AI cheat sheet for your terminal.
 
 ![qcheat demo](assets/qcheat.gif)
 
-`qcheat` uses Ollama and Qwen2.5-Coder to answer short command-line questions directly in your shell, with Markdown and syntax highlighting rendered by `mdcat`.
+`qcheat` uses Ollama and Qwen2.5-Coder to answer short command-line questions directly in your shell. When possible, it grounds answers in official documentation already installed with the tool you are asking about. Markdown and syntax highlighting are rendered by `mdcat`.
 
 ```text
-qcheat → Ollama → qwen-cheat → mdcat → terminal
+qcheat → local docs (when available) → Ollama → qwen-cheat → mdcat → terminal
 ```
 
 No API key is required.
 
 After the model and dependencies have been downloaded, queries are processed locally.
 
-## Index
+## Index <!-- omit from toc -->
 
-+ [qcheat](#qcheat)
-	+ [Index](#index)
-	+ [What it is for](#what-it-is-for)
-	+ [Example](#example)
-	+ [Requirements](#requirements)
-	+ [Installation](#installation)
-		+ [Preview an installation](#preview-an-installation)
-	+ [Usage](#usage)
-	+ [Optional short alias](#optional-short-alias)
-	+ [The custom model](#the-custom-model)
-	+ [Why not AIChat + Qwen3?](#why-not-aichat--qwen3)
-	+ [Privacy and offline use](#privacy-and-offline-use)
-	+ [Files installed](#files-installed)
-	+ [Updating](#updating)
-	+ [Uninstall](#uninstall)
-	+ [Troubleshooting](#troubleshooting)
-		+ [`qcheat: command not found`](#qcheat-command-not-found)
-		+ [Ollama is not running](#ollama-is-not-running)
-		+ [mdcat takes a long time to install on Apple Silicon](#mdcat-takes-a-long-time-to-install-on-apple-silicon)
-	+ [License](#license)
++ [What it is for](#what-it-is-for)
++ [Example](#example)
++ [Local documentation](#local-documentation)
++ [Requirements](#requirements)
++ [Installation](#installation)
+	+ [Preview an installation](#preview-an-installation)
++ [Usage](#usage)
++ [Optional short alias](#optional-short-alias)
++ [The custom model](#the-custom-model)
++ [Why not AIChat + Qwen3?](#why-not-aichat--qwen3)
++ [Privacy and offline use](#privacy-and-offline-use)
++ [Bugs \& quirks](#bugs--quirks)
++ [Files installed](#files-installed)
++ [Updating](#updating)
++ [Uninstall](#uninstall)
++ [Troubleshooting](#troubleshooting)
+	+ [`qcheat: command not found`](#qcheat-command-not-found)
+	+ [Ollama is not running](#ollama-is-not-running)
+	+ [mdcat takes a long time to install on Apple Silicon](#mdcat-takes-a-long-time-to-install-on-apple-silicon)
++ [License](#license)
 
 ## What it is for
 
@@ -66,10 +66,10 @@ The assistant focuses on:
 * macOS and Linux
 * zsh and bash
 * Git and GitHub CLI
-* Vim
+* Vim and Neovim
 * VS Code
 
-`qcheat` automatically includes the current operating system, shell and CPU architecture with each question.
+`qcheat` automatically includes the current operating system, shell and CPU architecture with each question. For Vim, Neovim, Git, GitHub CLI and supported system commands, it first tries to use official documentation from the local installation.
 
 > [!WARNING]
 > `qcheat` is currently still stupid and may give wrong or incomplete answers. I still need to fine tune it.
@@ -87,6 +87,24 @@ yiw
 
 Copies the word under the cursor.
 ```
+
+
+## Local documentation
+
+Before asking Qwen, `qcheat` performs a best-effort, read-only lookup in official documentation already installed on the machine.
+
+Currently supported sources include:
+
+* Vim and Neovim help
+* Git documentation
+* GitHub CLI (`gh`) help
+* local man pages/help for common system commands
+
+If useful documentation is found, only small relevant excerpts are added to the prompt and treated as authoritative. If not, `qcheat` silently falls back to Qwen's built-in knowledge.
+
+No manuals are bundled or downloaded, and no cache or history is created.
+
+For implementation details, see [`docs/local-documentation.md`](docs/local-documentation.md).
 
 ## Requirements
 
@@ -110,7 +128,7 @@ On macOS, Homebrew is required.
 Clone the repository:
 
 ```bash
-git clone <your-qcheat-repository>
+gh repo clone cheeezeburgers/qcheat
 cd qcheat
 ```
 
@@ -131,8 +149,9 @@ The installer will:
 6. download `qwen2.5-coder:3b-instruct`
 7. build the custom `qwen-cheat` model
 8. install `qcheat` to `~/.local/bin/qcheat`
-9. offer to add `~/.local/bin` to your PATH if necessary
-10. optionally add a shorter shell alias
+9. install the local-documentation helpers to `~/.local/lib/qcheat/`
+10. offer to add `~/.local/bin` to your PATH if necessary
+11. optionally add a shorter shell alias
 
 > [!IMPORTANT]
 > `~/.local/bin` must be in your `PATH` for the `qcheat` command to work. The installer can add it for you if necessary.
@@ -298,6 +317,8 @@ qwen2.5-coder:3b-instruct
 
 Once Ollama, the model and mdcat have been installed, normal `qcheat` questions are handled locally.
 
+Local documentation lookup is read-only. It does not upload documentation, modify external tools, create a query cache or keep history.
+
 The output is rendered with:
 
 ```bash
@@ -308,12 +329,27 @@ which prevents mdcat from retrieving remote resources while rendering the answer
 
 An internet connection is still required for the initial installation and model download.
 
+## Bugs & quirks
+
+* Local documentation lookup is deliberately conservative. Ambiguous questions may skip it and fall back to Qwen's built-in knowledge.
+* The final answer is still generated by Qwen, so even documentation-grounded answers can be wrong or incomplete.
+* Ambiguous Vim wording can still be mistaken for a shell-level `vim ...` invocation instead of an in-editor command.
+* `qcheat` cannot ask a follow-up question yet when the intended tool is unclear.
+* VS Code questions currently use Qwen's built-in knowledge rather than local documentation.
+
 ## Files installed
 
 The qcheat executable:
 
 ```text
 ~/.local/bin/qcheat
+```
+
+The documentation lookup helpers:
+
+```text
+~/.local/lib/qcheat/docs.sh
+~/.local/lib/qcheat/excerpt.awk
 ```
 
 Ollama stores the downloaded base model and the custom `qwen-cheat` model in its normal model storage.
@@ -350,10 +386,12 @@ This replaces the installed `qcheat` executable and rebuilds the custom model fr
 
 ## Uninstall
 
-Remove the command:
+Remove the command and qcheat-owned documentation helpers:
 
 ```bash
 rm ~/.local/bin/qcheat
+rm ~/.local/lib/qcheat/docs.sh ~/.local/lib/qcheat/excerpt.awk
+rmdir ~/.local/lib/qcheat 2>/dev/null || true
 ```
 
 Remove the custom model:
