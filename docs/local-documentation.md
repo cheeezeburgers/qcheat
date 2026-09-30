@@ -63,18 +63,20 @@ resolved path, including when invoked through a symlink or outside the checkout.
 For removal, these two qcheat-owned library files can be removed along with the
 command; remove their directory when empty.
 
-Run the offline suite with `bash tests/run.sh`. It generates synthetic fixtures
+Run the offline suite with `bash dev/tests/run.sh`. It generates synthetic fixtures
 inside a temporary repository directory, mocks Ollama, mdcat and help commands,
 tests both installer OS branches, and cleans up on exit. No network, actual model
 inference, downloads or changes to the user's shell configuration are required.
-`bash tests/run.sh --read-only` runs the subset without fixture creation (older
+`bash dev/tests/run.sh --read-only` runs the subset without fixture creation (older
 Bash versions may still need temporary files for the existing help heredocs).
 The project uses Bash-native tests; no Bats dependency is required.
 
 Validate syntax with `bash -n` on `bin/qcheat`, `install.sh`, `lib/docs.sh` and
-`tests/run.sh`; run ShellCheck on the same files. Both Linux and macOS CI run the
+`dev/tests/run.sh`; run ShellCheck on the same files. Both Linux and macOS CI run the
 offline suite, including source/install help, versions, argument/stdin prompts,
 input safety, documentation bounds, errors, fallback and installer dry-run.
+
+Development notes and session history live in `dev/DEVLOG.md`.
 
 Known limits: natural-language routing and synonym matching are intentionally
 small. There is no fuzzy search across all documentation, plugin documentation,

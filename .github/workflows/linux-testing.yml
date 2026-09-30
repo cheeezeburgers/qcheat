@@ -32,10 +32,10 @@ jobs:
           bash -n install.sh
           bash -n bin/qcheat
           bash -n lib/docs.sh
-          bash -n tests/run.sh
+          bash -n dev/tests/run.sh
 
       - name: Test offline documentation lookup and installation
-        run: bash tests/run.sh
+        run: bash dev/tests/run.sh
 
       - name: Test installer dry-run
         run: |

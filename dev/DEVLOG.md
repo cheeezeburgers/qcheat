@@ -1,5 +1,20 @@
 # Development log
 
+## 0.3.1 — 2026-09-30
+
+Branch: `fix/dev-test-paths`
+
+- Adjusted the relocated `dev/tests/run.sh` to find the repository root two
+  levels above its directory; updated both platform CI jobs and development
+  documentation to use the new test path and log location.
+- Bumped the canonical CLI version from 0.3.0 to 0.3.1 and synchronized test
+  expectations; the installer still reads the version from the CLI.
+- Reviewed the Modelfile without changing it. Recommended explicit precedence
+  for supplied local documentation over examples and built-in knowledge, an
+  insufficient-documentation rule, and explicit Neovim scope.
+- Validation: all 84 offline checks, Bash syntax, ShellCheck and whitespace
+  checks passed locally on macOS; no model inference or Linux-host run.
+
 ## 0.3.0 — 2026-09-30
 
 Branch: `feature/local-official-doc-grounding`
