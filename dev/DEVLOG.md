@@ -1,5 +1,27 @@
 # Development log
 
+## 0.4.0 — 2026-10-01
+
+Branch: `feature/makefile`
+
+- Adapted the copied Makefile and `dev/release.sh` for qcheat, retaining
+  `./install.sh` as the canonical installer and `bin/qcheat` as the canonical
+  version source (0.3.1 → 0.4.0).
+- Added scoped uninstall of the command, installed lookup library and custom
+  `qwen-cheat` model; shared dependencies, base models and shell rc files remain.
+  Missing resources are skipped; model/server errors are reported for retry.
+- Kept annotated `v<version>` tags, clean-checkout and remote conflict checks,
+  explicit tag-only pushes, GitHub authentication/permission checks and generated
+  release notes. Release creation now requires an already-pushed matching tag.
+  Added helper help/version output and non-mutating release/uninstall dry-runs.
+- Added 88 Bash helper checks with isolated Git/GitHub/Ollama/removal mocks and
+  Make recipe previews; integrated them into the existing offline suite and
+  Linux/macOS CI syntax checks. All 172 offline checks, Bash syntax, ShellCheck
+  and whitespace checks passed locally on macOS. README is unchanged.
+- Live installation/uninstallation, tag creation/pushing and GitHub release
+  creation were deliberately not exercised; shell aliases/PATH cleanup is manual.
+  No Linux-host validation was performed.
+
 ## 0.3.1 — 2026-09-30
 
 Branch: `fix/dev-test-paths`

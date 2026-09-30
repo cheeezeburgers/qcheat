@@ -7,6 +7,7 @@ ROOT="$(cd -- "${BASH_SOURCE[0]%/*}/../.." && pwd -P)"
 source "$ROOT/lib/docs.sh"
 QCHEAT_DOCS_DIR="$ROOT/lib"
 checks=0
+TEST_HOST_PATH="$PATH"
 
 fail_test() { printf 'FAIL: %s\n' "$*" >&2; exit 1; }
 equal() {
@@ -73,8 +74,8 @@ for flag in -h --help; do
   contains "$(bash "$ROOT/install.sh" "$flag")" 'Usage:' 'installer help'
 done
 for flag in -V --version; do
-  equal "$(bash "$ROOT/bin/qcheat" "$flag")" 'qcheat 0.3.1' 'CLI version'
-  equal "$(bash "$ROOT/install.sh" "$flag")" 'qcheat 0.3.1' 'installer version'
+  equal "$(bash "$ROOT/bin/qcheat" "$flag")" 'qcheat 0.4.0' 'CLI version'
+  equal "$(bash "$ROOT/install.sh" "$flag")" 'qcheat 0.4.0' 'installer version'
 done
 
 # A useful subset can be run even in a read-only checkout.
@@ -319,7 +320,10 @@ ln -s "$HOME/.local/bin/qcheat" "$WORK/bin/linked-qcheat"
 equal "$(linked-qcheat gh create pull request)" 'fixture answer' 'symlinked installed command'
 printf 'y\nn\n' | "$REAL_BASH" "$ROOT/install.sh" > "$WORK/reinstall-output"
 equal "$(grep -c 'export PATH=' "$HOME/.bashrc")" 1 'repeat install preserves PATH block'
-equal "$("$HOME/.local/bin/qcheat" --version)" 'qcheat 0.3.1' 'installed version'
+equal "$("$HOME/.local/bin/qcheat" --version)" 'qcheat 0.4.0' 'installed version'
 rm "$HOME/.local/lib/qcheat/docs.sh"
 equal "$("$HOME/.local/bin/qcheat" explain loops)" 'fixture answer' 'missing library fallback'
 printf 'PASS: %s checks\n' "$checks"
+
+# Restore the host utilities for the helper suite's own isolated mocks.
+PATH="$TEST_HOST_PATH" "$REAL_BASH" "$ROOT/dev/tests/helpers.sh"

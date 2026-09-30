@@ -34,8 +34,11 @@ jobs:
           bash -n bin/qcheat
           bash -n lib/docs.sh
           bash -n dev/tests/run.sh
+          bash -n dev/release.sh
+          bash -n dev/uninstall.sh
+          bash -n dev/tests/helpers.sh
 
-      - name: Test offline documentation lookup and installation
+      - name: Test offline documentation, installation and helpers
         run: bash dev/tests/run.sh
 
       - name: Test installer dry-run

@@ -1,14 +1,17 @@
-.PHONY: install tag push-tag release
+.PHONY: install uninstall tag push-tag release
 
 install:
 	./install.sh
 
-# Commit the current version first, then make tag; publish with push-tag or release.
+uninstall:
+	bash dev/uninstall.sh
+
+# Commit the current version first, then tag, push-tag and release in order.
 tag:
-	bash development/release.sh tag
+	bash dev/release.sh tag
 
 push-tag:
-	bash development/release.sh push-tag
+	bash dev/release.sh push-tag
 
 release:
-	bash development/release.sh release
+	bash dev/release.sh release
