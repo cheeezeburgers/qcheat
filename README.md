@@ -128,14 +128,13 @@ On macOS, Homebrew is required.
 Clone the repository:
 
 ```bash
-gh repo clone cheeezeburgers/qcheat
+git clone https://github.com/cheeezeburgers/qcheat.git
 cd qcheat
 ```
 
 Run:
 
 ```bash
-chmod +x install.sh
 ./install.sh
 ```
 
