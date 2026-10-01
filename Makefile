@@ -1,10 +1,14 @@
 .DEFAULT_GOAL := help
-.PHONY: help install uninstall dry-run test lint check tag push-tag release demo
+.PHONY: help install update uninstall dry-run test lint check demo tag push-tag release
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*## "} /^[[:alnum:]_-]+:.*## / {printf "  %-12s %s\n", $$1, $$2}' "$(strip $(MAKEFILE_LIST))"
 
 install: ## Install qcheat
+	./install.sh
+
+update: ## Update qcheat from GitHub
+	git pull --ff-only
 	./install.sh
 
 uninstall: ## Remove qcheat-owned installed resources
