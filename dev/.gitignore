@@ -8,7 +8,7 @@
 .idea/
 
 # Helpers
-*.tape
+#*.tape
 
 # Temporary files
 *.swp
@@ -23,7 +23,7 @@
 TODO*.md
 AGENTS*.md
 CODEX*.md
-DEVLOG.md
+#DEVLOG.md
 
 # Secrets / local environment
 .env
