@@ -1,5 +1,25 @@
 # Development log
 
+## 0.4.1 — 2026-10-01
+
+Branch: `fix/makefile-help`
+
+- Made `help` the default Make goal and documented all targets with `##`
+  descriptions. Added installer dry-run, offline tests, ShellCheck, combined
+  validation and VHS demo targets; kept existing install/uninstall/release
+  delegation and the existing `dev/demo.tape` output path.
+- Split the accidental `esacaction=$1` into separate statements, preserving the
+  surrounding local argument-validation edits in `dev/release.sh`.
+- Bumped the canonical version from 0.4.0 to 0.4.1 and synchronized test
+  expectations. Expanded helper checks for Make help, delegation and validation;
+  handled macOS Make's leading whitespace in `MAKEFILE_LIST`.
+- Validation: `make help`, `make lint`, `make test`, `make check`, Bash syntax,
+  ShellCheck and whitespace checks passed on macOS; 190 offline checks passed
+  (84 existing checks and 106 helper checks). README remained unchanged.
+- No live install/uninstall, tag/push/release or VHS demo was run. Existing
+  offline fixtures and non-mutating recipe previews cover those delegates;
+  actual demo regeneration and Linux-host validation remain manual.
+
 ## 0.4.0 — 2026-10-01
 
 Branch: `feature/makefile`

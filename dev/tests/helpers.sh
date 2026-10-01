@@ -140,12 +140,24 @@ uninstall_check() {
 }
 
 # Dry Make recipes still run when files happen to share the target names.
-for target in install uninstall tag push-tag release; do touch "$WORK/make fixture/$target"; done
-recipes=$("$REAL_MAKE" -n -C "$WORK/make fixture" -f "$ROOT/Makefile" install uninstall tag push-tag release)
+for target in help install uninstall dry-run test lint check tag push-tag release demo; do touch "$WORK/make fixture/$target"; done
+recipes=$("$REAL_MAKE" -n -C "$WORK/make fixture" -f "$ROOT/Makefile" install uninstall dry-run test lint check tag push-tag release demo)
 contains "$recipes" './install.sh' 'canonical installer delegation'
 contains "$recipes" 'bash dev/uninstall.sh' 'uninstall delegation'
 for action in tag push-tag release; do
     contains "$recipes" "bash dev/release.sh $action" "release delegation: $action"
+done
+contains "$recipes" "./install.sh --dry-run" "installer dry-run delegation"
+contains "$recipes" "bash dev/tests/run.sh" "offline suite delegation"
+contains "$recipes" "shellcheck install.sh bin/qcheat lib/*.sh dev/*.sh dev/tests/*.sh" "all project shell scripts linted"
+contains "$recipes" "vhs dev/demo.tape" "existing demo tape path"
+check_recipes=$("$REAL_MAKE" -n -C "$ROOT" check)
+contains "$check_recipes" "shellcheck" "check includes lint"
+contains "$check_recipes" "bash dev/tests/run.sh" "check includes tests"
+default_help=$("$REAL_MAKE" -s -C "$ROOT")
+equal "$default_help" "$("$REAL_MAKE" -s -C "$ROOT" help)" "default goal is help"
+for target in help install uninstall dry-run test lint check tag push-tag release demo; do
+    contains "$default_help" "  $target " "documented target: $target"
 done
 absent "$recipes" jrnl 'no copied project names'
 absent "$recipes" development/ 'no copied project paths'

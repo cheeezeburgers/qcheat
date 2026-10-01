@@ -74,8 +74,8 @@ for flag in -h --help; do
   contains "$(bash "$ROOT/install.sh" "$flag")" 'Usage:' 'installer help'
 done
 for flag in -V --version; do
-  equal "$(bash "$ROOT/bin/qcheat" "$flag")" 'qcheat 0.4.0' 'CLI version'
-  equal "$(bash "$ROOT/install.sh" "$flag")" 'qcheat 0.4.0' 'installer version'
+  equal "$(bash "$ROOT/bin/qcheat" "$flag")" 'qcheat 0.4.1' 'CLI version'
+  equal "$(bash "$ROOT/install.sh" "$flag")" 'qcheat 0.4.1' 'installer version'
 done
 
 # A useful subset can be run even in a read-only checkout.
@@ -320,7 +320,7 @@ ln -s "$HOME/.local/bin/qcheat" "$WORK/bin/linked-qcheat"
 equal "$(linked-qcheat gh create pull request)" 'fixture answer' 'symlinked installed command'
 printf 'y\nn\n' | "$REAL_BASH" "$ROOT/install.sh" > "$WORK/reinstall-output"
 equal "$(grep -c 'export PATH=' "$HOME/.bashrc")" 1 'repeat install preserves PATH block'
-equal "$("$HOME/.local/bin/qcheat" --version)" 'qcheat 0.4.0' 'installed version'
+equal "$("$HOME/.local/bin/qcheat" --version)" 'qcheat 0.4.1' 'installed version'
 rm "$HOME/.local/lib/qcheat/docs.sh"
 equal "$("$HOME/.local/bin/qcheat" explain loops)" 'fixture answer' 'missing library fallback'
 printf 'PASS: %s checks\n' "$checks"

@@ -30,7 +30,17 @@ case "${1:-}" in
 esac
 dry_run=false
 if [[ ${1:-} == --dry-run ]]; then dry_run=true; shift; fi
-(( $# == 1 )) && [[ $1 == tag || $1 == push-tag || $1 == release ]] || fail 'Usage: bash dev/release.sh [--dry-run] tag|push-tag|release'
+if (( $# != 1 )); then
+  fail 'Usage: bash dev/release.sh [--dry-run] tag|push-tag|release'
+fi
+
+case "$1" in
+  tag|push-tag|release)
+    ;;
+  *)
+    fail 'Usage: bash dev/release.sh [--dry-run] tag|push-tag|release'
+    ;;
+esac
 action=$1
 run() {
     if [[ $dry_run == true ]]; then
