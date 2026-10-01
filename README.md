@@ -32,6 +32,8 @@ After the model and dependencies have been downloaded, queries are processed loc
 + [Requirements](#requirements)
 + [Installation](#installation)
 	+ [Preview an installation](#preview-an-installation)
+	+ [Updating](#updating)
+	+ [Uninstall](#uninstall)
 + [Usage](#usage)
 + [Optional short alias](#optional-short-alias)
 + [The custom model](#the-custom-model)
@@ -39,12 +41,11 @@ After the model and dependencies have been downloaded, queries are processed loc
 + [Privacy and offline use](#privacy-and-offline-use)
 + [Bugs \& quirks](#bugs--quirks)
 + [Files installed](#files-installed)
-+ [Updating](#updating)
-+ [Uninstall](#uninstall)
 + [Troubleshooting](#troubleshooting)
 	+ [`qcheat: command not found`](#qcheat-command-not-found)
 	+ [Ollama is not running](#ollama-is-not-running)
 	+ [mdcat takes a long time to install on Apple Silicon](#mdcat-takes-a-long-time-to-install-on-apple-silicon)
++ [Developer tools](#developer-tools)
 + [License](#license)
 
 ## What it is for
@@ -87,7 +88,6 @@ yiw
 
 Copies the word under the cursor.
 ```
-
 
 ## Local documentation
 
@@ -132,11 +132,19 @@ git clone https://github.com/cheeezeburgers/qcheat.git
 cd qcheat
 ```
 
-Run:
+Install with:
 
 ```bash
 ./install.sh
 ```
+
+Or, if you have `make`:
+
+```bash
+make install
+```
+
+`./install.sh` remains the canonical installer.
 
 The installer will:
 
@@ -161,19 +169,83 @@ The installer will:
 ./install.sh --dry-run
 ```
 
+or:
+
+```bash
+make dry-run
+```
+
 Dry-run prints the commands and shell configuration blocks it would apply. It does not install dependencies, start services, download or build models, create directories, copy files, or edit shell configuration. Read-only checks still run, including OS detection, dependency versions, and `ollama list`. The PATH and alias prompts remain interactive; accepting them only previews the changes.
 
 On Linux, dry-run skips package metadata queries and assumes the first available supported package manager provides `mdcat`. A real installation checks package availability and may choose a different fallback.
 
 Installer options:
 
-| Option            | Description                                 |
-| ----------------- | ------------------------------------------- |
-| `--dry-run`       | Preview installation without making changes |
-| `-h`, `--help`    | Show installer help                         |
-| `-V`, `--version` | Show the project version                    |
+| Option | Description |
+| --- | --- |
+| `--dry-run` | Preview installation without making changes |
+| `-h`, `--help` | Show installer help |
+| `-V`, `--version` | Show the project version |
 
 Unknown installer arguments are rejected with exit status 2 before installation begins.
+
+### Updating
+
+From the cloned repository:
+
+```bash
+git pull --ff-only
+./install.sh
+```
+
+Or:
+
+```bash
+make update
+```
+
+This updates the repository, replaces the installed `qcheat` files and rebuilds the custom model from the current `Modelfile`.
+
+### Uninstall
+
+If you have `make`:
+
+```bash
+make uninstall
+```
+
+Or remove the qcheat-owned files manually:
+
+```bash
+rm ~/.local/bin/qcheat
+rm ~/.local/lib/qcheat/docs.sh ~/.local/lib/qcheat/excerpt.awk
+rmdir ~/.local/lib/qcheat 2>/dev/null || true
+```
+
+Remove the custom model:
+
+```bash
+ollama rm qwen-cheat
+```
+
+> [!CAUTION]
+> Only remove the base model if you do not use it with any other Ollama tools or projects.
+
+If you do not use the base model for anything else:
+
+```bash
+ollama rm qwen2.5-coder:3b-instruct
+```
+
+If you added an optional alias, remove the corresponding line from `~/.zshrc` or `~/.bashrc`:
+
+```bash
+alias q='qcheat'
+```
+
+You can also remove the qcheat PATH entry if `~/.local/bin` is not used by any of your other programs.
+
+Ollama and mdcat are deliberately not automatically removed because other applications may depend on them.
 
 ## Usage
 
@@ -367,57 +439,6 @@ or:
 
 for `~/.local/bin` and the optional short alias.
 
-## Updating
-
-Pull the latest repository changes:
-
-```bash
-git pull
-```
-
-Then run the installer again:
-
-```bash
-./install.sh
-```
-
-This replaces the installed `qcheat` executable and rebuilds the custom model from the current `Modelfile`.
-
-## Uninstall
-
-Remove the command and qcheat-owned documentation helpers:
-
-```bash
-rm ~/.local/bin/qcheat
-rm ~/.local/lib/qcheat/docs.sh ~/.local/lib/qcheat/excerpt.awk
-rmdir ~/.local/lib/qcheat 2>/dev/null || true
-```
-
-Remove the custom model:
-
-```bash
-ollama rm qwen-cheat
-```
-
-> [!CAUTION]
-> Only remove the base model if you do not use it with any other Ollama tools or projects.
-
-If you do not use the base model for anything else, you can also remove it:
-
-```bash
-ollama rm qwen2.5-coder:3b-instruct
-```
-
-If you added an optional alias, remove the corresponding line from `~/.zshrc` or `~/.bashrc`:
-
-```bash
-alias q='qcheat'
-```
-
-You can also remove the qcheat PATH entry if `~/.local/bin` is not used by any of your other programs.
-
-Ollama and mdcat are deliberately not automatically removed because other applications may depend on them.
-
 ## Troubleshooting
 
 ### `qcheat: command not found`
@@ -463,6 +484,32 @@ arm64
 ```
 
 An old Intel Homebrew installation under `/usr/local` may cause packages to compile from source instead of using Apple-Silicon binary packages.
+
+## Developer tools
+
+The Makefile provides shortcuts for common development and maintenance tasks.
+
+```bash
+make             # Show available commands
+make help        # Show available commands
+make test        # Run the offline test suite
+make lint        # Run ShellCheck
+make check       # Run lint + tests
+make dry-run     # Preview installation
+make demo        # Regenerate the terminal demo
+```
+
+Running `make` without a target is safe and behaves like `make help`.
+
+Release helpers are also available for maintainers:
+
+```bash
+make tag
+make push-tag
+make release
+```
+
+These use the project's release helper and are intentionally separate from normal development checks.
 
 ## License
 
