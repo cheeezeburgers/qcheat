@@ -17,13 +17,36 @@ cache or history is involved. The original question and runtime context are kept
   and `vim --version` runtime information. Neovim uses the resolved executable's
   `share/nvim/runtime/doc`. Neither editor is started to read configuration or
   execute editor commands. Symlinks are resolved, including Homebrew layouts.
-- Editor lookup reads at most three selected help files: `change.txt`,
-  `motion.txt`, and one topic file. Exact help tags prioritize common current-word
-  and current-line editing questions. Definitions come from installed help text.
-- Git selects a built-in topic from a fixed list and reads its manual under the
-  installed executable's `git --man-path`. If unavailable, built-in `git <topic>
-  -h` usage is used. Configurable Git help viewers, aliases, and external Git
-  commands are never dispatched.
+- Editor discovery ranks command entries in installed `index.txt` and
+  `quickref.txt`, including short wrapped descriptions. Unqualified questions
+  prefer Normal-mode references; word editing favors word motions and operators
+  over unrelated window, filtering or launcher topics. Small editor-only bridges
+  match “jump” to move and “edit” to change terminology.
+- Index references resolve through the runtime's `tags` metadata to a fixed
+  shortlist of core help basenames. Paths, plugin files, conflicting mappings
+  and tag search expressions are never followed or executed. Resolved definition
+  tags are prioritized; unresolved references can use the index itself. At most
+  three distinct help files supply the final excerpts. Existing exact tags for
+  common current-word/current-line questions remain strongest, and missing or
+  unhelpful indexes retain `change.txt`, `motion.txt` and one topic-file fallback.
+- Git discovery uses the resolved executable's read-only
+  `git help --all --verbose --no-external-commands --no-aliases` descriptions,
+  intersected with `git --list-cmds=builtins`. This excludes even official scripts
+  and guide topics that Git's verbose index lists alongside built-ins. Explicit
+  built-in names are strong signals; “show staged changes” treats show as a verb.
+- Small Git-only terminology bridges connect unstaged changes with the working
+  tree, staged/unstaging with the index, and discard/unstage with restore. Delete
+  also matches remove; it implies restore only with working-tree context, and
+  explicit untracked context suppresses that bridge. Thus “delete unstaged
+  changes” selects restore, “remove untracked files” selects clean, and “show
+  staged changes” selects diff. These hints select documentation, not commands
+  for the user to execute.
+- Selected Git topics use the exact manual under `git --man-path`, then built-in
+  `git <topic> -h` usage when needed. Unsupported, malformed, oversized, ambiguous
+  or unmatched indexes retain the old conservative topic selection. A fallback
+  topic's `-h` is used only when builtin membership can be verified; otherwise
+  its exact manual or the quiet Qwen-only fallback remains available. Git help
+  viewers, aliases, external commands and question tokens are never dispatched.
 - gh uses fixed `gh help` topic arguments, including `gh help pr create` for
   “gh create pull request”. Update notifications, telemetry, prompting and custom
   pagers are disabled for this subprocess. No action or extension is invoked.
@@ -39,9 +62,11 @@ cache or history is involved. The original question and runtime context are kept
 Search uses the first 2,048 question characters; the full question still reaches
 Qwen. Plain-text keyword scoring ranks windows deterministically and removes
 terminal formatting. It scores at most 20,000 lines or 1 MiB of source text,
-whichever comes first. Up to three excerpts include source labels and context,
-with at most 6,000 bytes total and 240 bytes per source line. Excess piped output
-is drained so producer exit statuses remain meaningful.
+whichever comes first. Discovery uses the same per-pass input limits; the editor
+indexes and tag metadata share one discovery budget. Git builtin enumeration is
+also capped at 1,024 names of at most 64 characters. Up to three excerpts include
+source labels and context, with at most 6,000 bytes total and 240 bytes per
+source line. Excess piped output is drained so producer exit statuses remain meaningful.
 
 Missing executables, libraries, manuals, renderers, unsupported topics, lookup
 errors and unmatched text silently preserve the original Qwen-only prompt. When
@@ -49,9 +74,10 @@ excerpts exist, the request tells Qwen that they are authoritative and to state
 when they do not support an answer. This is prompt guidance, not a guarantee of
 model correctness; there is no second inference or command execution.
 
-All query-derived text stays data. Command names, subcommands and help flags are
-allowlisted; questions are never evaluated or sourced. Only qcheat's own library
-is sourced, relative to the executable. Retrieval writes no persistent files,
+All query-derived text stays data. Help flags and generic commands come from
+fixed allowlists; discovered Git names require installed builtin membership,
+and editor files require core-basename validation. Questions are never evaluated
+or sourced. Only qcheat's own library is sourced, relative to the executable. Retrieval writes no persistent files,
 changes no configuration, and never installs anything or elevates permissions.
 
 ## Installation and development
@@ -75,12 +101,20 @@ Validate syntax with `bash -n` on `bin/qcheat`, `install.sh`, `lib/docs.sh` and
 `dev/tests/run.sh`; run ShellCheck on the same files. Both Linux and macOS CI run the
 offline suite, including source/install help, versions, argument/stdin prompts,
 input safety, documentation bounds, errors, fallback and installer dry-run.
+Regression fixtures cover natural Git state distinctions, explicit commands,
+excluded aliases/scripts, discovery failures, absent manuals, editor indexes,
+safe tag resolution, Normal-mode motion/editing questions and missing indexes.
+Model output is never asserted; the suite verifies routing and retrieval only.
 
 Development notes and session history live in `dev/DEVLOG.md`.
 
-Known limits: natural-language routing and synonym matching are intentionally
-small. There is no fuzzy search across all documentation, plugin documentation,
-interactive clarification or support for arbitrary gh extensions. Nonstandard
+Known limits: index descriptions are short and keyword ranking cannot fully
+understand natural language or resolve every ambiguous request. Editor lookup
+resolves only its core help shortlist, reads at most two continuation lines per
+index entry, and retains one discovered reference per source file; incomplete
+metadata can leave an index excerpt instead of the full definition. Natural
+language routing and synonym matching are intentionally small. There is no fuzzy
+search across all documentation, plugin documentation, interactive clarification or support for arbitrary gh extensions. Nonstandard
 runtime/man layouts (for example some AppImages, wrappers or alternatives
 installations) may fall back. Only `.1` and `.1.gz` manuals are located. Very long
 lines are shortened; later matches beyond the input budget are not searched.

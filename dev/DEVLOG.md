@@ -1,5 +1,30 @@
 # Development log
 
+## 0.5.0beta — 2026-10-01
+
+Branch: `feature/smarter-grounding`
+
+- Discover Git topics from the installed verbose command index, intersected with
+  validated builtins; preserve explicit commands and distinguish working-tree
+  restores, untracked cleanup and staged diffs with small contextual vocabulary.
+  Keep conservative manual fallback and require builtin proof before fallback
+  `-h`, including on older Git installations.
+- Discover Vim/Neovim references from installed index/quickref entries and resolve
+  literal tags only to core help basenames. Prefer word motions and change
+  operators for natural editing questions; preserve exact-tag and topic fallback,
+  three-file/excerpt limits, input/output budgets and quiet lookup failure.
+- Add 70 offline regression checks for routing, excluded aliases/scripts, index
+  failures, safe tag resolution, missing documentation and resource limits.
+  Update local-documentation notes and bump the canonical CLI version from
+  0.4.1 to 0.5.0beta; preserve README and the separately edited Modelfile.
+- Validation: Bash syntax, ShellCheck, the offline suite, `make test`, `make lint`,
+  `make check` and whitespace checks passed on macOS with Bash 3.2; all 260 checks
+  passed (154 routing/CLI checks and 106 helper checks). Read-only checks against
+  installed Git, Vim and Neovim confirmed the important natural-language routes.
+- No live installation/uninstallation, network, model inference, release or Git
+  history/push action was performed. No Linux-host validation was run locally;
+  natural-language selection remains a bounded best-effort heuristic.
+
 ## 0.4.1 — 2026-10-01
 
 Branch: `fix/makefile-help`

@@ -17,6 +17,11 @@ BEGIN {
     if (query ~ /recurs/) terms[++count] = "recurs"
     if (query ~ /folder/) terms[++count] = "director"
     if (query ~ /delete/) terms[++count] = "remove"
+    # Scope editor terminology so shell/Git questions keep their own meanings.
+    if (query ~ /(^| )(vim|nvim|neovim)( |$)/) {
+        if (query ~ /(^| )jump( |$)/) terms[++count] = "move"
+        if (query ~ /(^| )edit(ing)?( |$)/) terms[++count] = "chang"
+    }
 }
 {
     # Drain excess pipe input without SIGPIPE; bound retained text and scoring.
